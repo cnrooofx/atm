@@ -1,9 +1,18 @@
+from bank import Bank
+import shelve
 class Account:
-    def __init__(self,number,pin,email):
+    def __init__(self,number,pin,email,bank):
         self.number = number
         self.balance = 0
         self.pin = pin
         self.email = email
+        self.bank = bank
+        self.create_account()
+
+    def __str__(self):
+        outstr = "Account Number: %i  " %(self.number)
+        outstr += "Balance: %i, email: %s, Bank: %s" %(self.balance,self.email,str(self.bank))
+        return outstr
 
     @property
     def balance(self):
@@ -58,8 +67,25 @@ class Account:
         else:
             raise Exception("ERROR: NOT ENOUGH BALANCE")
 
+    def create_account(self):
+        if isinstance(self.bank,Bank):
+            x = shelve.open("bank_accounts")
+            x[str(self.number)] = str(self)
+            x.close()
+            return
+        raise ValueError("Error invalid bank")
+
     
-    
+aib = Bank("aib")
+a1 = Account(1,1234,"123@gmail.com",aib)
+a2 = Account(2,1234,"123@gmail.com",aib)
+a3 = Account(3,1234,"123@gmail.com",aib)
+a4 = Account(4,1234,"123@gmail.com",aib)
+a2.deposit(500)
+
+print(aib.find_account(2))
+
+print(aib.accounts.values())
   
 
 
