@@ -60,10 +60,12 @@ class Account:
 
     def deposit(self,val):
         self.balance += val
+        self.bank.update_shelf(self)
 
     def withdraw(self,val):
         if self._balance >= val:
             self.balance -= val
+            self.bank.update_shelf(self)
         else:
             raise Exception("ERROR: NOT ENOUGH BALANCE")
 
@@ -71,7 +73,6 @@ class Account:
         if isinstance(self.bank,Bank):
             x = shelve.open("bank_accounts")
             x[str(self.number)] = str(self)
-            x.close()
             return
         raise ValueError("Error invalid bank")
 
@@ -82,11 +83,18 @@ a2 = Account(2,1234,"123@gmail.com",aib)
 a3 = Account(3,1234,"123@gmail.com",aib)
 a4 = Account(4,1234,"123@gmail.com",aib)
 a2.deposit(500)
-
+print(a2)
+print(aib.find_account(2))
+print("acc updated")
 print(aib.find_account(2))
 
 print(aib.accounts.values())
   
+print("=============")
+aib.transfer_funds(a2,a3,250)
+print(aib.find_account(2))
+print(aib.find_account(2))
+print(aib.accounts.values())
 
 
 
