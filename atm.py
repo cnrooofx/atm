@@ -1,4 +1,5 @@
 from account import Account
+from bank import Bank
 
 class ATM:
     def __init__(self):
@@ -20,7 +21,7 @@ class ATM:
     def withdraw_user(self, account, amount):
         if not isinstance(amount, int) and not isinstance(amount, float):
             raise ValueError("ERROR: NUMBER INPUT REQUIRED")
-        elif account.balance > self.balance:
+        elif amount > self.balance:
             raise Exception("ERROR: ATM TOO SHORT FUNDS")
         else:
             account.withdraw(amount)
@@ -35,17 +36,30 @@ class ATM:
             self.balance += amount
             return('Success')
 
-    def transfter_user(self,account,account1,amount):
-        print('conor and alex please do your bank class xxxxxxx')
+    def transfter_user(self,bank,payer,payee,amount):
+        if isinstance(payer, Account) and isinstance(payee, Account):
+            if amount <= self.balance:
+                self.balance -= amount
+                bank.transfer_funds(payer,payee,amount)
+                return('Success')
+            else:
+                raise Exception("ERROR: ATM TOO SHORT FUNDS")
     
             
-
+'''
 atm = ATM()
-user = Account(1,4323,'wegwe')
+bank = Bank('AIB')
+user = Account(1,4323,'wegwe',bank)
+user1 = Account(2,4323,'wegwe',bank)
 print(user)
 user.deposit(1000)
+user1.deposit(1000)
 print(atm.withdraw_user(user,500))
 print(user.balance)
 print(atm.deposit_user(user,500))
 print(atm.deposit_user(user,500))
 print(atm.balance)
+print(atm.transfter_user(bank,user,user1,1000))
+print(atm.transfter_user(bank,user,user1,500))
+print(atm.balance)
+'''
