@@ -40,7 +40,7 @@ def admin_menu(user):
         console.print("1) Check ATM Balance")
         console.print("2) Top up Money")
         console.print("3) Remove Money")
-        console.print("\nPlease select an option or press (q) to Logout.")
+        console.print("\nPlease select an option or press (q) to quit.")
 
         menu_selection = get_user_selection(["1", "2", "3", "q"])
 
@@ -50,7 +50,7 @@ def admin_menu(user):
         while menu_selection is None:
             console.clear()
             console.print(Panel.fit("Total ATM Balance"))
-            console.print("€{}".format(balance))
+            console.print(f"€{balance}")
             console.print("\nPress (q) to quit.")
             menu_selection = get_user_selection(["q"])
 
@@ -68,12 +68,33 @@ def admin_menu(user):
         while menu_selection is None:
             console.clear()
             console.print(Panel.fit("Thank you"))
-            console.print("ATM Balance topped up by €{}".format(amount))
+            console.print(f"ATM Balance topped up by €{amount}")
             console.print("\nPress (q) to quit.")
             menu_selection = get_user_selection(["q"])
 
     elif menu_selection == "3":
-        print("Remove money")
+        amount = 0
+        error_msg = ""
+        while amount <= 0:
+            console.clear()
+            console.print(Panel.fit("Remove Money"))
+            if error_msg:
+                console.print(error_msg)
+            console.print("Enter the amount to remove")
+            amount = get_float_amount()
+            try:
+                atm.admin_withdraw(user, amount)
+            except ValueError:
+                error_msg = "Insufficient funds in ATM"
+                amount = 0.0
+
+        menu_selection = None
+        while menu_selection is None:
+            console.clear()
+            console.print(Panel.fit("Thank you"))
+            console.print(f"€{amount} removed from ATM")
+            console.print("\nPress (q) to quit.")
+            menu_selection = get_user_selection(["q"])
 
 
 def main_menu(user):
@@ -86,9 +107,9 @@ def main_menu(user):
         console.print("3) Deposit")
         console.print("4) Transfer Funds")
         console.print("5) Reset PIN")
-        console.print("\nPlease select an option or press (l) to Logout.")
+        console.print("\nPlease select an option or press (q) to quit.")
 
-        menu_selection = get_user_selection(["1", "2", "3", "4", "5", "l"])
+        menu_selection = get_user_selection(["1", "2", "3", "4", "5", "q"])
 
     if menu_selection == "1":
         print("Check balance")
