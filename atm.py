@@ -66,7 +66,9 @@ class ATM:
             self.balance += amount
 
     def check_balance(self,account):
-        if not account.get_admin():
+        if not isinstance(account,Account):
+            raise Exception("ERROR: Not a valid user")
+        elif not account.get_admin():
             raise Exception("ERROR: Not permitted to use this function")
         else:
             return self.balance
