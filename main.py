@@ -3,9 +3,11 @@
 from rich.console import Console
 from rich.panel import Panel
 
-from atm import ATM
+from atm import ATM, Account, Bank
+
 
 console = Console()
+aib = Bank("aib")
 atm = ATM()
 
 
@@ -21,18 +23,45 @@ def start_atm():
         menu_selection = get_user_selection(["1", "2"])
             
     if menu_selection == "2":
-        admin_menu()
+        admin = Account(1, 2345, "admin@aib.ie", aib, True)
+        admin_menu(admin)
     else:
         # Maybe a user login before going to the menu?
-        main_menu()
+        user = Account(123, 9876, "user1@aib.ie", aib, False)
+        main_menu(user)
 
 
-def admin_menu():
-    console.clear()
-    console.print(Panel.fit("Admin Menu"))
+def admin_menu(user):
+    menu_selection = None
+    while menu_selection is None:
+        console.clear()
+        console.print(Panel.fit("Admin Menu"))
+        console.print("1) Check ATM Balance")
+        console.print("2) Top up Money")
+        console.print("3) Remove Money")
+        console.print("\nPlease select an option or press (q) to Logout.")
+
+        menu_selection = get_user_selection(["1", "2", "3", "q"])
+
+    if menu_selection == "1":
+        print("Check ATM balance")
+        balance = atm.check_balance(user)
+        menu_selection = None
+        while menu_selection is None:
+            console.clear()
+            console.print(Panel.fit("Total ATM Balance"))
+            console.print("€{}".format(balance))
+            console.print("\nPress (q) to quit.")
+
+            menu_selection = get_user_selection(["q"])
+
+    elif menu_selection == "2":
+        print("Top up money")
+    elif menu_selection == "3":
+        print("Remove money")
 
 
-def main_menu():
+def main_menu(user):
     menu_selection = None
     while menu_selection is None:
         console.clear()
