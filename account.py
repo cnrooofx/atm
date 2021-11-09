@@ -80,7 +80,8 @@ class Account:
             return
         raise ValueError("Error invalid bank")
 
-    
+
+'''
 aib = Bank("aib")
 a1 = Account(1,1234,"123@gmail.com",aib,False)
 a2 = Account(2,1234,"123@gmail.com",aib,False)
@@ -99,7 +100,7 @@ aib.transfer_funds(a2,a3,250)
 print(aib.find_account(2))
 print(aib.find_account(2))
 print(aib.accounts.values())
-
+'''
 
 
     
