@@ -1,12 +1,13 @@
 from bank import Bank
 import shelve
 class Account:
-    def __init__(self,number,pin,email,bank):
+    def __init__(self,number,pin,email,bank,admin):
         self.number = number
         self.balance = 0
         self.pin = pin
         self.email = email
         self.bank = bank
+        self.admin = admin
         self.create_account()
 
     def __str__(self):
@@ -26,6 +27,10 @@ class Account:
             raise Exception("ERROR: NUMBER IS NOT GREATER THAN 0")
         else: 
             self._balance = x
+
+    def get_admin(self):
+        return self.admin
+
 
     @property
     def pin(self):
@@ -77,10 +82,10 @@ class Account:
 
     
 aib = Bank("aib")
-a1 = Account(1,1234,"123@gmail.com",aib)
-a2 = Account(2,1234,"123@gmail.com",aib)
-a3 = Account(3,1234,"123@gmail.com",aib)
-a4 = Account(4,1234,"123@gmail.com",aib)
+a1 = Account(1,1234,"123@gmail.com",aib,False)
+a2 = Account(2,1234,"123@gmail.com",aib,False)
+a3 = Account(3,1234,"123@gmail.com",aib,False)
+a4 = Account(4,1234,"123@gmail.com",aib,False)
 a2.deposit(500)
 print(a2)
 print(aib.find_account(2))
