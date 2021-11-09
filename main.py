@@ -3,7 +3,9 @@
 from rich.console import Console
 from rich.panel import Panel
 
-from atm import ATM, Account, Bank
+from atm import ATM
+from account import Account
+from bank import Bank
 
 
 console = Console()
@@ -21,12 +23,11 @@ def start_atm():
         console.print("\nPlease select an option.")
 
         menu_selection = get_user_selection(["1", "2"])
-            
+
     if menu_selection == "2":
         admin = Account(1, 2345, "admin@aib.ie", aib, True)
         admin_menu(admin)
     else:
-        # Maybe a user login before going to the menu?
         user = Account(123, 9876, "user1@aib.ie", aib, False)
         main_menu(user)
 
@@ -44,7 +45,6 @@ def admin_menu(user):
         menu_selection = get_user_selection(["1", "2", "3", "q"])
 
     if menu_selection == "1":
-        print("Check ATM balance")
         balance = atm.check_balance(user)
         menu_selection = None
         while menu_selection is None:
@@ -52,11 +52,26 @@ def admin_menu(user):
             console.print(Panel.fit("Total ATM Balance"))
             console.print("€{}".format(balance))
             console.print("\nPress (q) to quit.")
-
             menu_selection = get_user_selection(["q"])
 
     elif menu_selection == "2":
-        print("Top up money")
+        amount = 0
+        while amount <= 0:
+            console.clear()
+            console.print(Panel.fit("Top-up ATM Balance"))
+            console.print("Enter the amount to top up by")
+            amount = get_float_amount()
+
+        atm.admin_deposit(user, amount)
+
+        menu_selection = None
+        while menu_selection is None:
+            console.clear()
+            console.print(Panel.fit("Thank you"))
+            console.print("ATM Balance topped up by €{}".format(amount))
+            console.print("\nPress (q) to quit.")
+            menu_selection = get_user_selection(["q"])
+
     elif menu_selection == "3":
         print("Remove money")
 
@@ -101,6 +116,19 @@ def get_user_selection(options):
         user_input = None
     return user_input
 
+
+def get_float_amount():
+    """Get user input as a float.
+
+    Returns:
+        (float): The input value as a float, or 0.0 if input was invalid.
+    """
+    user_input = input("-> ")
+    try:
+        amount = float(user_input)
+    except ValueError:
+        amount = 0.0
+    return amount
 
 if __name__ == "__main__":
     # while True:
