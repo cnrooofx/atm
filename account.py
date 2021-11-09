@@ -71,8 +71,7 @@ class Account:
 
     def create_account(self):
         if isinstance(self.bank,Bank):
-            x = shelve.open("bank_accounts")
-            x[str(self.number)] = str(self)
+            self.bank.accounts[str(self.number)] = str(self)
             return
         raise ValueError("Error invalid bank")
 
