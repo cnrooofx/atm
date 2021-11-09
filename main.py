@@ -45,56 +45,68 @@ def admin_menu(user):
         menu_selection = get_user_selection(["1", "2", "3", "q"])
 
     if menu_selection == "1":
-        balance = atm.check_balance(user)
-        menu_selection = None
-        while menu_selection is None:
-            console.clear()
-            console.print(Panel.fit("Total ATM Balance"))
-            console.print(f"€{balance}")
-            console.print("\nPress (q) to quit.")
-            menu_selection = get_user_selection(["q"])
+        admin_check_balance(user)
 
     elif menu_selection == "2":
-        amount = 0
-        while amount <= 0:
-            console.clear()
-            console.print(Panel.fit("Top-up ATM Balance"))
-            console.print("Enter the amount to top up by")
-            amount = get_float_amount()
-
-        atm.admin_deposit(user, amount)
-
-        menu_selection = None
-        while menu_selection is None:
-            console.clear()
-            console.print(Panel.fit("Thank you"))
-            console.print(f"ATM Balance topped up by €{amount}")
-            console.print("\nPress (q) to quit.")
-            menu_selection = get_user_selection(["q"])
+        admin_top_up(user)
 
     elif menu_selection == "3":
-        amount = 0
-        error_msg = ""
-        while amount <= 0:
-            console.clear()
-            console.print(Panel.fit("Remove Money"))
-            if error_msg:
-                console.print(error_msg)
-            console.print("Enter the amount to remove")
-            amount = get_float_amount()
-            try:
-                atm.admin_withdraw(user, amount)
-            except ValueError:
-                error_msg = "Insufficient funds in ATM"
-                amount = 0.0
+        admin_remove_money(user)
 
-        menu_selection = None
-        while menu_selection is None:
-            console.clear()
-            console.print(Panel.fit("Thank you"))
-            console.print(f"€{amount} removed from ATM")
-            console.print("\nPress (q) to quit.")
-            menu_selection = get_user_selection(["q"])
+
+def admin_check_balance(user):
+    balance = atm.check_balance(user)
+    menu_selection = None
+    while menu_selection is None:
+        console.clear()
+        console.print(Panel.fit("Total ATM Balance"))
+        console.print(f"€{balance}")
+        console.print("\nPress (q) to quit.")
+        menu_selection = get_user_selection(["q"])
+
+
+def admin_top_up(user):
+    amount = 0
+    while amount <= 0:
+        console.clear()
+        console.print(Panel.fit("Top-up ATM Balance"))
+        console.print("Enter the amount to top up by")
+        amount = get_float_amount()
+
+    atm.admin_deposit(user, amount)
+
+    menu_selection = None
+    while menu_selection is None:
+        console.clear()
+        console.print(Panel.fit("Thank you"))
+        console.print(f"ATM Balance topped up by €{amount}")
+        console.print("\nPress (q) to quit.")
+        menu_selection = get_user_selection(["q"])
+
+
+def admin_remove_money(user):
+    amount = 0
+    error_msg = ""
+    while amount <= 0:
+        console.clear()
+        console.print(Panel.fit("Remove Money"))
+        if error_msg:
+            console.print(error_msg)
+        console.print("Enter the amount to remove")
+        amount = get_float_amount()
+        try:
+            atm.admin_withdraw(user, amount)
+        except ValueError:
+            error_msg = "Insufficient funds in ATM"
+            amount = 0.0
+
+    menu_selection = None
+    while menu_selection is None:
+        console.clear()
+        console.print(Panel.fit("Thank you"))
+        console.print(f"€{amount} removed from ATM")
+        console.print("\nPress (q) to quit.")
+        menu_selection = get_user_selection(["q"])
 
 
 def main_menu(user):
