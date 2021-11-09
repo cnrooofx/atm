@@ -1,7 +1,7 @@
 from bank import Bank
 import shelve
 class Account:
-    def __init__(self,number,pin,email,bank,admin):
+    def __init__(self,number,pin,email,bank,admin=False):
         self.number = number
         self.balance = 0
         self.pin = pin
