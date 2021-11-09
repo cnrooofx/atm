@@ -44,8 +44,30 @@ class ATM:
                 return('Success')
             else:
                 raise Exception("ERROR: ATM TOO SHORT FUNDS")
-    
+
+    def admin_withdraw(self,account,amount):
+        if not isinstance(account,Account):
+            raise Exception("ERROR: Not a valid user")
+        elif not account.get_admin():
+            raise Exception("ERROR: User is not an admin")
+        elif amount > self.balance:
+            raise ValueError("ERROR: ATM SHORT ON FUNDS")
+        else:
+            self.balance-= amount
             
+    def admin_deposit(self,account,amount):
+        if not isinstance(account,Account):
+            raise Exception("ERROR: Not a valid user")
+        elif not account.get_admin():
+            raise Exception("ERROR: User is not an admin")
+        elif amount > self.balance:
+            raise ValueError("ERROR: ATM SHORT ON FUNDS")
+        else:
+            self.balance += amount
+
+    def check_balance(self):
+        return self.balance
+    
 '''
 atm = ATM()
 bank = Bank('AIB')
