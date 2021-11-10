@@ -1,109 +1,83 @@
-from bank import Bank
-import shelve
+from exceptions import AccountError
+
 class Account:
-    def __init__(self,number,pin,email,bank,admin=False):
-        self.number = number
-        self.balance = 0
-        self.pin = pin
-        self.email = email
-        self.bank = bank
-        self.admin = admin
-        self.create_account()
+    def __init__(self, iban: int, name: str, email: str, pin: int,
+                 admin: bool = False):
+        self._iban = iban
+        self._name = name
+        self._email = email
+        self._pin = pin
+        self._admin = admin
+        self._balance = 0
 
-    def __str__(self):
-        outstr = "Account Number: %i  " %(self.number)
-        outstr += "Balance: %i, email: %s, Bank: %s" %(self.balance,self.email,str(self.bank))
-        return outstr
+    def __str__(self) -> str:
+        string = f"""IBAN: {self._iban}\
+                   \nName: {self._name}\
+                   \nEmail: {self._email}\
+                   \nBalance: {self._balance}\n"""
+        if self._admin:
+            string += "---Admin Account---\n"
+        return string
 
-    @property
-    def balance(self):
-        return self._balance
-
-    @balance.setter 
-    def balance(self,x):
-        if not isinstance(x, int) and not isinstance(x, float):
-            raise ValueError("ERROR: NUMBER INPUT REQUIRED")
-        elif x < 0:
-            raise Exception("ERROR: NUMBER IS NOT GREATER THAN 0")
-        else: 
-            self._balance = x
-
-    def get_admin(self):
-        return self.admin
-
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Account):
+            raise TypeError("Must compare with another account.")
+        outcome = False
+        if self._iban == other.iban and self._name == other.name\
+           and self._email == other.email and self._pin == other.pin\
+           and self._admin == other.admin and self._balance == other.balance:
+            outcome = True
+        return outcome
 
     @property
-    def pin(self):
-        return self._pin
-
-    @pin.setter
-    def pin(self, newPin):
-        try:
-            if len(newPin) == 4:
-                self._pin = int(newPin)
-            else:
-                raise ValueError("PIN_Error(Length)")
-        except TypeError:
-            return "PIN_Error(Type)"
+    def iban(self):
+        return self._iban
 
     @property
-    def number(self):
-        return self._number
-    
-    @number.setter
-    def number(self,value):
-        self._number = value
+    def name(self):
+        return self._name
 
     @property
     def email(self):
         return self._email
 
-    @email.setter
-    def email(self,newEmail):
-        self._email = newEmail
+    @property
+    def pin(self):
+        return self._pin
+
+    @property
+    def admin(self):
+        return self._admin
+
+    @property
+    def balance(self):
+        return self._balance
+
+    def deposit(self, amount: float):
+        if not isinstance(amount, (int, float)):
+            raise TypeError("Must be of type int or float")
+        self._balance += amount
+
+    def withdraw(self, amount: float):
+        if not isinstance(amount, (int, float)):
+            raise TypeError("Must be of type int or float")
+        if amount > self._balance:
+            raise AccountError("Insufficient funds")
+        self._balance -= amount
+
+    def update_pin(self, new_pin: int):
+        if len(new_pin) != 4:
+            raise ValueError("Pin length must be 4.")
+        self._pin = int(new_pin)
 
 
-    def deposit(self,val):
-        self.balance += val
-        self.bank.update_shelf(self)
-
-    def withdraw(self,val):
-        if self._balance >= val:
-            self.balance -= val
-            self.bank.update_shelf(self)
-        else:
-            raise Exception("ERROR: NOT ENOUGH BALANCE")
-
-    def create_account(self):
-        if isinstance(self.bank,Bank):
-            self.bank.accounts[str(self.number)] = str(self)
-            return
-        raise ValueError("Error invalid bank")
+def main():
+    print("String Test\n-----------")
+    a1 = Account(1234, "Test", "test", 0000)
+    print(a1)
+    admin = Account(4567, "Admin", "admin@aib.ie", 1234, True)
+    print(admin)
 
 
-'''
-aib = Bank("aib")
-a1 = Account(1,1234,"123@gmail.com",aib,False)
-a2 = Account(2,1234,"123@gmail.com",aib,False)
-a3 = Account(3,1234,"123@gmail.com",aib,False)
-a4 = Account(4,1234,"123@gmail.com",aib,False)
-a2.deposit(500)
-print(a2)
-print(aib.find_account(2))
-print("acc updated")
-print(aib.find_account(2))
-
-print(aib.accounts.values())
-  
-print("=============")
-aib.transfer_funds(a2,a3,250)
-print(aib.find_account(2))
-print(aib.find_account(2))
-print(aib.accounts.values())
-'''
-
-
-    
-
-
-
+if __name__ == "__main__":
+    main()
