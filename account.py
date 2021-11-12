@@ -61,10 +61,6 @@ class Account:
         return self._name
 
     @property
-    def pin(self):
-        return self._pin
-
-    @property
     def admin(self):
         """Return whether the user is an admin or not."""
         return self._admin
@@ -102,6 +98,20 @@ class Account:
         if amount > self._balance:
             raise AccountError("Insufficient funds")
         self._balance -= amount
+
+    def check_pin(self, pin: int) -> bool:
+        """Check whether the given PIN matches the one on the account.
+
+        Args:
+            pin (int): The PIN to check.
+
+        Returns:
+            bool: True if the PINs are the same, otherwise False.
+        """
+        pin_equal = False
+        if pin == self._pin:
+            pin_equal = True
+        return pin_equal
 
     def update_pin(self, new_pin: int):
         """Update the user's PIN.
