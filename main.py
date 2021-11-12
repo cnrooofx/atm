@@ -1,4 +1,7 @@
-"""Install requirements with `pip3 install -r requirements.txt`"""
+"""The user interface of the ATM.
+
+Install requirements with `pip3 install -r requirements.txt`
+"""
 
 from time import sleep
 from rich.console import Console
@@ -70,10 +73,9 @@ def main_menu(atm, user):
 
     elif menu_selection == "4":
         print("Transfer")
-        # user_transfer(atm, user)
 
     elif menu_selection == "5":
-        reset_pin(user)
+        print("Reset PIN")
 
 
 def user_check_balance(atm, user):
@@ -150,14 +152,6 @@ def user_deposit(atm, user):
         console.print(f"Deposited €{amount} into your account")
         console.print("\nPress (q) to quit.")
         menu_selection = get_user_selection(["q"])
-
-
-def user_transfer(user):
-    pass
-
-
-def reset_pin(user):
-    pass
 
 
 def admin_menu(atm, user):

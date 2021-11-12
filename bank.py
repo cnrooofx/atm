@@ -1,32 +1,37 @@
-from account import Account
+"""A bank to be used with an ATM."""
+
 import shelve
 
+from account import Account
 from exceptions import BankError, AccountError
 
 
 class Bank:
+    """A bank that contains a database of accounts."""
+
     def __init__(self, bank_id: str, bank_name: str):
-        """Initialise a new Bank.
+        """Create a new Bank.
 
         Args:
-            bank_id (str): Short identifier for the bank (Must have no spaces)
-            bank_name (str): Longer name of the bank for printing strings
+            bank_id (str): Short identifier for the bank (Must have no spaces).
+            bank_name (str): Longer name of the bank for printing strings.
         """
         self._name = bank_name
         self._database = f"{bank_id}_bank_accounts"
         self._next_iban = 1
 
     def __str__(self) -> str:
+        """Returns a string of the name of the Bank."""
         return str(self._name)
 
     def __contains__(self, iban: int) -> bool:
         """Returns whether or not the account is in this bank.
 
         Args:
-            iban (int): The IBAN of the account to check
+            iban (int): The IBAN of the account to check.
 
         Returns:
-            bool: True if the account is in the bank, otherwise False
+            bool: True if the account is in the bank, otherwise False.
         """
         contained = False
         with shelve.open(self._database) as accounts:
@@ -36,9 +41,22 @@ class Bank:
 
     @property
     def name(self):
+        """Get the name of the Bank."""
         return self._name
 
     def get_account(self, iban: int) -> Account:
+        """Get the user account corresponding to the given IBAN.
+
+        Args:
+            iban (int): The bank account identifier to get.
+
+        Raises:
+            KeyError: If the account does not exist in the database.
+
+        Returns:
+            Account: The user account with the given IBAN.
+        """
+        account = None
         with shelve.open(self._database) as accounts:
             if str(iban) not in accounts:
                 raise KeyError("Account does not exist")
@@ -46,8 +64,20 @@ class Bank:
         return account
 
     def login(self, iban: int) -> Account:
-        if iban in self:
-            return self.get_account(iban)
+        """Authenticate a user logging into an ATM.
+
+        Args:
+            iban (int): The bank account identifier of the user.
+
+        Raises:
+            BankError: If the authentication fails.
+
+        Returns:
+            Account: The user's account.
+        """
+        if iban not in self:
+            raise BankError("User authentication failed")
+        return self.get_account(iban)
 
     def valid_user(self, user: Account) -> bool:
         """Checks whether the given user data matches the database.
@@ -63,9 +93,19 @@ class Bank:
         if user == account:
             validated = True
         return validated
-       
 
     def check_balance(self, user: Account) -> float:
+        """Get the given user's account balance.
+
+        Args:
+            user (Account): The account to get the balance of.
+
+        Raises:
+            BankError: If the user data has been tampered with.
+
+        Returns:
+            float: The user's account balance.
+        """
         if not self.valid_user(user):
             raise BankError("User data has been tampered with")
         account = self.get_account(user.iban)
@@ -75,13 +115,14 @@ class Bank:
         """Withdraw the given amount from the user's account.
 
         Args:
-            user (Account): The user account to withdraw from.
-            amount (float): The amount to withdraw
+            user (Account): The account to withdraw from.
+            amount (float): The amount to withdraw.
 
         Raises:
-            TypeError: [description]
-            BankError: [description]
-            AccountError: [description]
+            TypeError: If the amount isn't a float or an int.
+            ValueError: If the amount is not greater than 0.
+            BankError: If the user's data has been tampered with.
+            AccountError: If the user doesn't have sufficient balance.
         """
         if not isinstance(amount, (int, float)):
             raise TypeError("Must be of type int or float")
@@ -93,20 +134,21 @@ class Bank:
             account = accounts[str(user.iban)]
             try:
                 account.withdraw(amount)
-            except AccountError as e:
-                raise AccountError() from e
+            except AccountError as error:
+                raise AccountError() from error
             accounts[str(user.iban)] = account
 
     def deposit(self, user: Account, amount: float):
         """Deposit the given amount into the user's account.
 
         Args:
-            user (Account): The user account to deposit into.
-            amount (float): The amount of the deposit.
+            user (Account): The account to deposit into
+            amount (float): The amount to deposit.
 
         Raises:
-            TypeError: If the amount is not a float or an int.
-            BankError: If the users data has been tampered with.
+            TypeError: If the amount isn't a float or an int.
+            ValueError: If the amount is not greater than 0.
+            BankError: If the user's data has been tampered with.
         """
         if not isinstance(amount, (int, float)):
             raise TypeError("Must be of type int or float")
@@ -119,30 +161,15 @@ class Bank:
             account.deposit(amount)
             accounts[str(user.iban)] = account
 
-    # def transfer_funds(self, account, payee, ammount):
-    #     with shelve.open(self._database) as accounts:
-    #         current_iban = str(account.iban)
-    #         payee_iban = str(payee.iban)
-    #         current_account = accounts.get(current_iban)
-    #         payee_account = accounts.get(payee_iban)
-
-    #         if current_account is None or payee_account is None:
-    #             raise KeyError("Account does not exist")
-    #         account.balance -= ammount
-    #         payee.balance += ammount
-    #         accounts[current_iban] = account
-    #         accounts[payee_iban] = payee
-
     def create_account(self, name: str, email: str, pin: int) -> int:
         """Add a user to the bank and return their bank account number (IBAN).
 
         Args:
-            name (str): The user's name
-            email (str): The user's email
-            pin (int): The 4 digit pin for logging into an ATM
+            name (str): The user's name.
+            pin (int): The 4 digit pin for logging into an ATM.
 
         Returns:
-            int: The users bank account number (IBAN)
+            int: The users bank account number (IBAN).
         """
         iban = self._next_iban
         account = Account(iban, name, email, pin)
@@ -155,12 +182,11 @@ class Bank:
         """Add an admin to the bank and return their account number (IBAN).
 
         Args:
-            name (str): The admin's name
-            email (str): The admin's email
-            pin (int): The 4 digit pin for logging into an ATM
+            name (str): The admin's name.
+            pin (int): The 4 digit pin for logging into an ATM.
 
         Returns:
-            int: The admin's bank account number (IBAN)
+            int: The admin's bank account number (IBAN).
         """
         iban = self._next_iban
         account = Account(iban, name, email, pin, admin=True)
@@ -185,15 +211,3 @@ class Bank:
             raise BankError("User data has been tampered with")
         account = self.get_account(user.iban)
         return account.admin
-
-
-def main():
-    aib = Bank("aib_test", "Allied Irish Banks")
-    user1 = aib.create_account("User 1", "email1", 1234)
-    print(user1 in aib)
-    user1_account = aib.get_account(user1)
-    print(user1_account)
-
-
-if __name__ == "__main__":
-    main()

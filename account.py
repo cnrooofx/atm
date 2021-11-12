@@ -1,8 +1,20 @@
+"""A user account for a bank."""
+
 from exceptions import AccountError
 
 class Account:
+    """An account for a bank containing the user details."""
+
     def __init__(self, iban: int, name: str, email: str, pin: int,
                  admin: bool = False):
+        """Create a new account.
+
+        Args:
+            iban (int): The bank account identifier of the account.
+            name (str): The user's name.
+            pin (int): The user's PIN to authenticate at an ATM.
+            admin (bool, optional): User's admin status. Defaults to False.
+        """
         self._iban = iban
         self._name = name
         self._email = email
@@ -11,6 +23,7 @@ class Account:
         self._balance = 0
 
     def __str__(self) -> str:
+        """Return a string representation of the account."""
         string = f"""IBAN: {self._iban}\
                    \nName: {self._name}\
                    \nEmail: {self._email}\
@@ -20,6 +33,17 @@ class Account:
         return string
 
     def __eq__(self, other) -> bool:
+        """Check if two account objects have the same account data.
+
+        Args:
+            other (Account): The other account to compare.
+
+        Raises:
+            TypeError: If trying to compare with something other than Account.
+
+        Returns:
+            bool: True if the two accounts are the same, False otherwise.
+        """
         if not isinstance(other, Account):
             raise TypeError("Must compare with another account.")
         outcome = False
@@ -31,10 +55,12 @@ class Account:
 
     @property
     def iban(self):
+        """Get the user's IBAN."""
         return self._iban
 
     @property
     def name(self):
+        """Get the user's name."""
         return self._name
 
     @property
@@ -47,18 +73,37 @@ class Account:
 
     @property
     def admin(self):
+        """Return whether the user is an admin or not."""
         return self._admin
 
     @property
     def balance(self):
+        """Get the user's account balance."""
         return self._balance
 
     def deposit(self, amount: float):
+        """Deposit the given amount into the account.
+
+        Args:
+            amount (float): The amount to deposit
+
+        Raises:
+            TypeError: If the amount is not a float or an int.
+        """
         if not isinstance(amount, (int, float)):
             raise TypeError("Must be of type int or float")
         self._balance += amount
 
     def withdraw(self, amount: float):
+        """Withdraw the given amount from the account.
+
+        Args:
+            amount (float): The amount to withdraw.
+
+        Raises:
+            TypeError: If the amount is not a float or an int.
+            AccountError: If the account does not have sufficient balance.
+        """
         if not isinstance(amount, (int, float)):
             raise TypeError("Must be of type int or float")
         if amount > self._balance:
@@ -66,18 +111,14 @@ class Account:
         self._balance -= amount
 
     def update_pin(self, new_pin: int):
+        """Update the user's PIN.
+
+        Args:
+            new_pin (int): The new PIN.
+
+        Raises:
+            ValueError: If the PIN is not exactly 4 digits long.
+        """
         if len(new_pin) != 4:
             raise ValueError("Pin length must be 4.")
         self._pin = int(new_pin)
-
-
-def main():
-    print("String Test\n-----------")
-    a1 = Account(1234, "Test", "test", 0000)
-    print(a1)
-    admin = Account(4567, "Admin", "admin@aib.ie", 1234, True)
-    print(admin)
-
-
-if __name__ == "__main__":
-    main()
