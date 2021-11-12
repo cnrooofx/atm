@@ -5,8 +5,7 @@ from exceptions import AccountError
 class Account:
     """An account for a bank containing the user details."""
 
-    def __init__(self, iban: int, name: str, email: str, pin: int,
-                 admin: bool = False):
+    def __init__(self, iban: int, name: str, pin: int, admin: bool = False):
         """Create a new account.
 
         Args:
@@ -17,7 +16,6 @@ class Account:
         """
         self._iban = iban
         self._name = name
-        self._email = email
         self._pin = pin
         self._admin = admin
         self._balance = 0
@@ -26,7 +24,6 @@ class Account:
         """Return a string representation of the account."""
         string = f"""IBAN: {self._iban}\
                    \nName: {self._name}\
-                   \nEmail: {self._email}\
                    \nBalance: {self._balance}\n"""
         if self._admin:
             string += "---Admin Account---\n"
@@ -48,8 +45,8 @@ class Account:
             raise TypeError("Must compare with another account.")
         outcome = False
         if self._iban == other.iban and self._name == other.name\
-           and self._email == other.email and self._pin == other.pin\
-           and self._admin == other.admin and self._balance == other.balance:
+           and self._pin == other.pin and self._admin == other.admin\
+           and self._balance == other.balance:
             outcome = True
         return outcome
 
@@ -62,10 +59,6 @@ class Account:
     def name(self):
         """Get the user's name."""
         return self._name
-
-    @property
-    def email(self):
-        return self._email
 
     @property
     def pin(self):

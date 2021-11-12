@@ -161,7 +161,7 @@ class Bank:
             account.deposit(amount)
             accounts[str(user.iban)] = account
 
-    def create_account(self, name: str, email: str, pin: int) -> int:
+    def create_account(self, name: str, pin: int) -> int:
         """Add a user to the bank and return their bank account number (IBAN).
 
         Args:
@@ -172,13 +172,13 @@ class Bank:
             int: The users bank account number (IBAN).
         """
         iban = self._next_iban
-        account = Account(iban, name, email, pin)
+        account = Account(iban, name, pin)
         with shelve.open(self._database) as accounts:
             accounts[str(iban)] = account
         self._next_iban += 1
         return iban
 
-    def create_admin_account(self, name: str, email: str, pin: int) -> int:
+    def create_admin_account(self, name: str, pin: int) -> int:
         """Add an admin to the bank and return their account number (IBAN).
 
         Args:
@@ -189,7 +189,7 @@ class Bank:
             int: The admin's bank account number (IBAN).
         """
         iban = self._next_iban
-        account = Account(iban, name, email, pin, admin=True)
+        account = Account(iban, name, pin, True)
         with shelve.open(self._database) as accounts:
             accounts[str(iban)] = account
         self._next_iban += 1
