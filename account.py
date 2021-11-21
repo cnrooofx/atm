@@ -45,8 +45,8 @@ class Account:
             raise TypeError("Must compare with another account.")
         outcome = False
         if self._iban == other.iban and self._name == other.name\
-           and self._pin == other.pin and self._admin == other.admin\
-           and self._balance == other.balance:
+           and self._admin == other.admin and self._balance == other.balance\
+           and other.check_pin(self._pin):
             outcome = True
         return outcome
 
