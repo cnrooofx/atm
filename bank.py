@@ -88,6 +88,8 @@ class Bank:
         Returns:
             bool: True if the account matches the database, False otherwise.
         """
+        if not isinstance(user, Account):
+            return False
         validated = False
         account = self.get_account(user.iban)
         if user == account:
@@ -126,17 +128,18 @@ class Bank:
         """
         if not isinstance(amount, (int, float)):
             raise TypeError("Must be of type int or float")
-        if amount <= 0:
+        elif amount <= 0:
             raise ValueError("Amount must be greater than 0")
-        if not self.valid_user(user):
+        elif not self.valid_user(user):
             raise BankError("User data has been tampered with")
-        with shelve.open(self._database) as accounts:
-            account = accounts[str(user.iban)]
-            try:
-                account.withdraw(amount)
-            except AccountError as error:
-                raise AccountError() from error
-            accounts[str(user.iban)] = account
+        else:
+            with shelve.open(self._database) as accounts:
+                account = accounts[str(user.iban)]
+                try:
+                    account.withdraw(amount)
+                except AccountError as error:
+                    raise AccountError() from error
+                accounts[str(user.iban)] = account
 
     def deposit(self, user: Account, amount: float):
         """Deposit the given amount into the user's account.
