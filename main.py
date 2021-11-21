@@ -17,14 +17,14 @@ console = Console()
 def setup():
     aib = Bank("aib", "Allied Irish Banks")
 
-    user1 = aib.create_account("Aidan", "aidan@aib.ie", 1234)
-    user2 = aib.create_account("Dan", "dan@aib.ie", 2345)
-    user3 = aib.create_account("Conor", "conor@aib.ie", 3456)
-    user4 = aib.create_account("Alex", "alex@aib.ie", 4567)
-    admin = aib.create_admin_account("Conor", "which Conor?", 1010)
+    user1 = aib.create_account("Aidan", 1234)
+    user2 = aib.create_account("Dan", 2345)
+    user3 = aib.create_account("Conor", 3456)
+    user4 = aib.create_account("Alex", 4567)
+    admin = aib.create_admin_account("Conor", 1010)
 
     boi = Bank("boi", "Bank of Ireland")
-    boi.create_account("Mary", "mary@boi.ie", 1123)
+    boi.create_account("Mary", 1123)
 
     aib_atm = ATM(aib)
     # boi_atm = ATM(boi)
