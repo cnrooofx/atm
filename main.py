@@ -17,20 +17,44 @@ console = Console()
 def setup():
     aib = Bank("aib", "Allied Irish Banks")
 
-    user1 = aib.create_account("Aidan", 1234)
-    user2 = aib.create_account("Dan", 1234)
-    user3 = aib.create_account("Conor", 1234)
-    user4 = aib.create_account("Alex",1234)
-    admin = aib.create_admin_account("Conor", 1234)
+    user1_name = "Aidan"
+    user1_pin = 1234
+
+    user2_name = "Dan"
+    user2_pin = 2345
+
+    user3_name = "Conor"
+    user3_pin = 3456
+
+    user4_name = "Alex"
+    user4_pin = 4567
+
+    admin_name = "Admin"
+    admin_pin = 0000
+
+    user1 = aib.create_account(user1_name, user1_pin)
+    user2 = aib.create_account(user2_name, user2_pin)
+    user3 = aib.create_account(user3_name, user3_pin)
+    user4 = aib.create_account(user4_name, user4_pin)
+    admin = aib.create_admin_account(admin_name, admin_pin)
 
     boi = Bank("boi", "Bank of Ireland")
-    boi.create_account("Mary",1123)
+
+    transfer_user_name = "Transfer - Mary"
+    transfer_user_pin = 1123
+    transfer_user = boi.create_account(transfer_user_name, transfer_user_pin)
 
     aib_atm = ATM(aib)
     # boi_atm = ATM(boi)
     aib_atm.add_connected_bank(boi)
 
-    iban_list = [user1, user2, user3, user4, admin]
+    iban_list = []
+    iban_list.append((user1, user1_name, user1_pin))
+    iban_list.append((user2, user2_name, user2_pin))
+    iban_list.append((user3, user3_name, user3_pin))
+    iban_list.append((user4, user4_name, user4_pin))
+    iban_list.append((admin, admin_name, admin_pin))
+    iban_list.append((transfer_user, transfer_user_name, transfer_user_pin))
     return aib_atm, iban_list
 
 
@@ -319,6 +343,9 @@ if __name__ == "__main__":
     aib_atm, iban_list = setup()
 
     print(iban_list)
+    with open("iban_list.txt", "w") as file:
+        for user in iban_list:
+            file.write(str(user))
     sleep(5)  # Show the IBANs for 5 seconds before the screen gets cleared
 
     while True:

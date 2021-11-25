@@ -1,6 +1,7 @@
 """A bank to be used with an ATM."""
 
 import shelve
+from random import randint
 
 from account import Account
 from exceptions import BankError, AccountError
@@ -18,7 +19,6 @@ class Bank:
         """
         self._name = bank_name
         self._database = f"{bank_id}_bank_accounts"
-        self._next_iban = 1
 
     def __str__(self) -> str:
         """Returns a string of the name of the Bank."""
@@ -187,11 +187,10 @@ class Bank:
         Returns:
             int: The users bank account number (IBAN).
         """
-        iban = self._next_iban
+        iban = self._generate_iban()
         account = Account(iban, name, pin)
         with shelve.open(self._database) as accounts:
             accounts[str(iban)] = account
-        self._next_iban += 1
         return iban
 
     def create_admin_account(self, name: str, pin: int) -> int:
@@ -204,11 +203,10 @@ class Bank:
         Returns:
             int: The admin's bank account number (IBAN).
         """
-        iban = self._next_iban
+        iban = self._generate_iban()
         account = Account(iban, name, pin, True)
         with shelve.open(self._database) as accounts:
             accounts[str(iban)] = account
-        self._next_iban += 1
         return iban
 
     def check_admin(self, user: Account) -> bool:
@@ -227,3 +225,11 @@ class Bank:
             raise BankError("User data has been tampered with")
         account = self.get_account(user.iban)
         return account.admin
+
+    def _generate_iban(self):
+        iban = None
+        while iban is None:
+            iban = randint(10000000, 99999999)
+            if iban in self:
+                iban = None
+        return iban
