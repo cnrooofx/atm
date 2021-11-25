@@ -39,6 +39,7 @@ def setup():
     admin = aib.create_admin_account(admin_name, admin_pin)
 
     boi = Bank("boi", "Bank of Ireland")
+    revolut = Bank("revolut", "Revolut")
 
     transfer_user_name = "Transfer - Mary"
     transfer_user_pin = 1123
@@ -47,6 +48,7 @@ def setup():
     aib_atm = ATM(aib)
     # boi_atm = ATM(boi)
     aib_atm.add_connected_bank(boi)
+    aib_atm.add_connected_bank(revolut)
 
     iban_list = []
     iban_list.append((user1, user1_name, user1_pin))
@@ -111,7 +113,7 @@ def main_menu(atm, user):
         user_deposit(atm, user)
 
     elif menu_selection == "4":
-        print("Transfer")
+        user_transfer(atm, user)
 
     elif menu_selection == "5":
         user_reset_pin(atm, user)
@@ -190,6 +192,72 @@ def user_deposit(atm, user):
         console.clear()
         console.print(Panel.fit("Thank you"))
         console.print(f"Deposited €{amount} into your account")
+        console.print("\nPress (q) to quit.")
+        menu_selection = get_user_selection(["q"])
+
+
+def user_transfer(atm, user):
+    banks = atm.get_connected_banks()
+    bank_list = []
+    for bank_name in banks:
+        bank_list.append(bank_name)
+
+    menu_selection = None
+    while menu_selection is None:
+        console.clear()
+        console.print(Panel.fit("Bank Transfer"))
+        menu_option = 1
+        for bank_name in banks:
+            console.print(f"{menu_option}) {bank_name}")
+            menu_option += 1
+        console.print("\nPress (q) to quit.")
+        options = [str(option) for option in range(1, menu_option)] + ["q"]
+        menu_selection = get_user_selection(options)
+        if menu_selection == "q":
+            return
+
+    transfer_bank_name = bank_list[int(menu_selection) - 1]
+    transfer_bank = atm.get_connected_bank(transfer_bank_name)
+
+    transferred = False
+    error_msg = ""
+    while not transferred:
+        iban = None
+        while iban is None:
+            console.clear()
+            console.print(Panel.fit(f"Transfer to {transfer_bank_name}"))
+            if error_msg:
+                console.print(error_msg)
+                error_msg = ""
+            console.print("Please enter the IBAN of the user to transfer to")
+            console.print("or press (q) to quit.")
+            iban = get_iban()
+            if iban == "q":
+                return
+
+        amount = 0.0
+        while amount <= 0:
+            console.clear()
+            console.print(Panel.fit(f"Transfer to Account: {iban}"))
+            console.print("Enter the amount to transfer")
+            amount = get_amount()
+        try:
+            atm.user_withdraw(user, amount)
+        except exceptions.AccountError:
+            error_msg = "Insufficient balance for transfer.\n"
+            continue
+        try:
+            transfer_bank.transfer(iban, amount)
+        except exceptions.BankError:
+            error_msg = "Invalid IBAN.\n"
+            continue
+        transferred = True
+
+    menu_selection = None
+    while menu_selection is None:
+        console.clear()
+        console.print(Panel.fit("Thank you"))
+        console.print(f"Transferred €{amount} successfully to account {iban}")
         console.print("\nPress (q) to quit.")
         menu_selection = get_user_selection(["q"])
 
@@ -338,12 +406,23 @@ def get_user_pin() -> int:
     return pin
 
 
-if __name__ == "__main__":
+def get_iban() -> int:
+    iban = input("-> ")
+    if len(iban) != 8:
+        iban = None
+    else:
+        try:
+            iban = int(iban)
+        except ValueError:
+            iban = None
+    return iban
 
+
+if __name__ == "__main__":
     aib_atm, iban_list = setup()
 
     print(iban_list)
-    with open("iban_list.txt", "w") as file:
+    with open("iban_list.txt", "w", encoding="utf-8") as file:
         for user in iban_list:
             file.write(str(user))
     sleep(5)  # Show the IBANs for 5 seconds before the screen gets cleared
