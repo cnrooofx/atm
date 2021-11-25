@@ -226,3 +226,11 @@ class ATM:
         """
         if bank_name in self._connected_banks:
             return self._connected_banks[bank_name]
+
+    def get_connected_banks(self) -> dict:
+        """Get the dictionary of Banks connected to this ATM.
+
+        Returns:
+            dict: The connected banks.
+        """
+        return self._connected_banks
