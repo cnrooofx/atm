@@ -68,6 +68,7 @@ class Bank:
 
         Args:
             iban (int): The bank account identifier of the user.
+            pin (int): The user's PIN.
 
         Raises:
             BankError: If the authentication fails.
@@ -76,11 +77,11 @@ class Bank:
             Account: The user's account.
         """
         if iban not in self:
-            raise BankError("User authentication failed")
-        acc = self.get_account(iban)
-        if acc._pin == int(pin):
-            return acc
-        raise BankError("User authentication failed")
+            raise BankError("Account does not exist")
+        account = self.get_account(iban)
+        if not account.check_pin(pin):
+            raise BankError("Incorrect PIN")
+        return account
 
     def valid_user(self, user: Account) -> bool:
         """Checks whether the given user data matches the database.
@@ -91,12 +92,11 @@ class Bank:
         Returns:
             bool: True if the account matches the database, False otherwise.
         """
-        if not isinstance(user, Account):
-            return False
         validated = False
-        account = self.get_account(user.iban)
-        if user == account:
-            validated = True
+        if isinstance(user, Account):
+            account = self.get_account(user.iban)
+            if user == account:
+                validated = True
         return validated
 
     def check_balance(self, user: Account) -> float:
