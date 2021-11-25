@@ -51,7 +51,7 @@ def atm_login(atm: ATM):
         while menu_selection is None:
             console.clear()
             console.print(Panel.fit("Sorry!"))
-            console.print(f"Invalid IBAN or PIN.")
+            console.print("Invalid IBAN or PIN.")
             console.print("\nPress (q) to quit.")
             menu_selection = get_user_selection(["q"])
         return
@@ -60,7 +60,6 @@ def atm_login(atm: ATM):
         admin_menu(atm, user)
     else:
         main_menu(atm, user)
-
 
 
 def main_menu(atm, user):
@@ -91,7 +90,7 @@ def main_menu(atm, user):
         print("Transfer")
 
     elif menu_selection == "5":
-        print("Reset PIN")
+        user_reset_pin(atm, user)
 
 
 def user_check_balance(atm, user):
@@ -107,12 +106,9 @@ def user_check_balance(atm, user):
 
 def user_withdraw(atm, user):
     amount = 0.0
-    error_msg = ""
     while amount <= 0:
         console.clear()
         console.print(Panel.fit("Withdrawal"))
-        if error_msg:
-            console.print(error_msg)
         console.print("Enter the amount to withdraw")
         amount = get_amount()
         try:
@@ -126,12 +122,16 @@ def user_withdraw(atm, user):
                 console.print("\nPress (q) to quit.")
                 menu_selection = get_user_selection(["q"])
             return
-
         except exceptions.AtmError:
-            console.clear()
-            console.print(Panel.fit("Sorry!"))
-            console.print("Insufficient funds in ATM")
-            console.print(" Please come back again later")
+            menu_selection = None
+            while menu_selection is None:
+                console.clear()
+                console.clear()
+                console.print(Panel.fit("Sorry!"))
+                console.print("Insufficient funds in ATM")
+                console.print("Please come back again later")
+                console.print("\nPress (q) to quit.")
+                menu_selection = get_user_selection(["q"])
             return
 
     menu_selection = None
@@ -168,6 +168,32 @@ def user_deposit(atm, user):
         console.print(f"Deposited €{amount} into your account")
         console.print("\nPress (q) to quit.")
         menu_selection = get_user_selection(["q"])
+
+
+def user_reset_pin(atm, user):
+    valid_pin = None
+    error_msg = ""
+    while valid_pin is None:
+        pin = None
+        while pin is None:
+            console.clear()
+            console.print(Panel.fit("Reset PIN"))
+            if error_msg:
+                console.print(error_msg + "\n")
+                error_msg = ""
+            console.print("Please enter your new PIN.")
+            pin = get_user_pin()
+        verify_pin = None
+        while verify_pin is None:
+            console.clear()
+            console.print(Panel.fit("Reset PIN"))
+            console.print("Please re-enter the PIN.")
+            verify_pin = get_user_pin()
+        if pin == verify_pin:
+            valid_pin = pin
+        else:
+            error_msg = "Both PINs must match, please try again."
+    atm.user_reset_pin(user, valid_pin)
 
 
 def admin_menu(atm, user):

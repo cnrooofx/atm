@@ -126,6 +126,6 @@ class Account:
         Raises:
             ValueError: If the PIN is not exactly 4 digits long.
         """
-        if len(new_pin) != 4:
+        if len(str(new_pin)) != 4:
             raise ValueError("Pin length must be 4.")
         self._pin = int(new_pin)

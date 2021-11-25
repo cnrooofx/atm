@@ -98,6 +98,11 @@ class ATM:
         self._bank.deposit(account, amount)
         self._balance += amount
 
+    def user_reset_pin(self, account: Account, new_pin: int):
+        if not isinstance(account, Account):
+            raise TypeError("Not a valid user")
+        self._bank.reset_pin(account, new_pin)
+
     def admin_withdraw(self, account: Account, amount: float):
         """Remove funds from the ATM, if the user is an admin.
 

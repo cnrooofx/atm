@@ -143,6 +143,17 @@ class Bank:
                 raise AccountError() from error
             accounts[str(user.iban)] = account
 
+    def reset_pin(self, user: Account, new_pin: int):
+        if not self.valid_user(user):
+            raise BankError("User data has been tampered with")
+        with shelve.open(self._database) as accounts:
+            account = accounts[str(user.iban)]
+            try:
+                account.update_pin(new_pin)
+            except ValueError as error:
+                raise ValueError() from error
+            accounts[str(user.iban)] = account
+
     def deposit(self, user: Account, amount: float):
         """Deposit the given amount into the user's account.
 
