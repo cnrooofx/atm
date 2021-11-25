@@ -98,6 +98,12 @@ class ATM:
         self._bank.deposit(account, amount)
         self._balance += amount
 
+    def user_transfer(self, account: Account, amount: float,
+                      transfer_bank: str, transfer_iban: int):
+        self.user_withdraw(account, amount)
+        other_bank = self.get_connected_bank(transfer_bank)
+        other_bank.transfer(transfer_iban, amount)
+
     def user_reset_pin(self, account: Account, new_pin: int):
         if not isinstance(account, Account):
             raise TypeError("Not a valid user")

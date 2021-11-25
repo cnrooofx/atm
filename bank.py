@@ -176,6 +176,12 @@ class Bank:
             account = accounts[str(user.iban)]
             account.deposit(amount)
             accounts[str(user.iban)] = account
+    
+    def transfer(self, iban: int, amount: float):
+        if iban not in self:
+            raise BankError("Account does not exist")
+        account = self.get_account(iban)
+        self.deposit(account, amount)
 
     def create_account(self, name: str, pin: int) -> int:
         """Add a user to the bank and return their bank account number (IBAN).
@@ -226,7 +232,12 @@ class Bank:
         account = self.get_account(user.iban)
         return account.admin
 
-    def _generate_iban(self):
+    def _generate_iban(self) -> int:
+        """Generate a random 8-digit IBAN.
+
+        Returns:
+            int: The new IBAN.
+        """
         iban = None
         while iban is None:
             iban = randint(10000000, 99999999)
