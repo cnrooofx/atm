@@ -18,15 +18,6 @@ def setup():
     aib = Bank("aib", "Allied Irish Banks")
 
     user1 = aib.create_account("Aidan", 1234)
-<<<<<<< Updated upstream
-    user2 = aib.create_account("Dan", 2345)
-    user3 = aib.create_account("Conor", 3456)
-    user4 = aib.create_account("Alex", 4567)
-    admin = aib.create_admin_account("Conor", 1010)
-
-    boi = Bank("boi", "Bank of Ireland")
-    boi.create_account("Mary", 1123)
-=======
     user2 = aib.create_account("Dan", 1234)
     user3 = aib.create_account("Conor", 1234)
     user4 = aib.create_account("Alex",1234)
@@ -34,7 +25,6 @@ def setup():
 
     boi = Bank("boi", "Bank of Ireland")
     boi.create_account("Mary",1123)
->>>>>>> Stashed changes
 
     aib_atm = ATM(aib)
     # boi_atm = ATM(boi)
