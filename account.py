@@ -45,8 +45,8 @@ class Account:
             raise TypeError("Must compare with another account.")
         outcome = False
         if self._iban == other.iban and self._name == other.name\
-           and self._pin == other._pin and self._admin == other.admin\
-           and self._balance == other.balance:
+           and self._admin == other.admin and self._balance == other.balance\
+           and other.check_pin(self._pin):
             outcome = True
         return outcome
 
@@ -109,6 +109,10 @@ class Account:
             bool: True if the PINs are the same, otherwise False.
         """
         pin_equal = False
+        try:
+            pin = int(pin)
+        except ValueError:
+            return False
         if pin == self._pin:
             pin_equal = True
         return pin_equal
