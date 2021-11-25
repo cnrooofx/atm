@@ -39,9 +39,22 @@ def atm_login(atm: ATM):
     console.print(Panel.fit("Welcome"))
     console.print("Please enter your IBAN")
     iban = input("-> ")
-    console.print("Please enter your PIN to login")
-    pin = input("-> ")
-    user = atm.login(iban,pin)
+    pin = None
+    while pin is None:
+        console.clear()
+        console.print("Please enter your PIN to login")
+        pin = get_user_pin()
+    try:
+        user = atm.login(iban, pin)
+    except exceptions.BankError:
+        menu_selection = None
+        while menu_selection is None:
+            console.clear()
+            console.print(Panel.fit("Sorry!"))
+            console.print(f"Invalid IBAN or PIN.")
+            console.print("\nPress (q) to quit.")
+            menu_selection = get_user_selection(["q"])
+        return
 
     if user.admin:
         admin_menu(atm, user)
@@ -262,6 +275,17 @@ def get_amount() -> float:
     except ValueError:
         amount = 0.0
     return amount
+
+
+def get_user_pin() -> int:
+    user_input = input("-> ")
+    if len(user_input) != 4:
+        pin = None
+    try:
+        pin = int(user_input)
+    except ValueError:
+        pin = None
+    return pin
 
 
 if __name__ == "__main__":
