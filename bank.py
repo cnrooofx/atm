@@ -63,7 +63,7 @@ class Bank:
             account = accounts[str(iban)]
         return account
 
-    def login(self, iban: int) -> Account:
+    def login(self, iban: int, pin: int) -> Account:
         """Authenticate a user logging into an ATM.
 
         Args:
@@ -77,7 +77,10 @@ class Bank:
         """
         if iban not in self:
             raise BankError("User authentication failed")
-        return self.get_account(iban)
+        acc = self.get_account(iban)
+        if acc._pin == int(pin):
+            return acc
+        raise BankError("User authentication failed")
 
     def valid_user(self, user: Account) -> bool:
         """Checks whether the given user data matches the database.
