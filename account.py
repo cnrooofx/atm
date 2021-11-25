@@ -45,8 +45,13 @@ class Account:
             raise TypeError("Must compare with another account.")
         outcome = False
         if self._iban == other.iban and self._name == other.name\
+<<<<<<< Updated upstream
            and self._admin == other.admin and self._balance == other.balance\
            and other.check_pin(self._pin):
+=======
+           and self._pin == other._pin and self._admin == other.admin\
+           and self._balance == other.balance:
+>>>>>>> Stashed changes
             outcome = True
         return outcome
 
