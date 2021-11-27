@@ -1,6 +1,7 @@
 """A bank to be used with an ATM."""
 
 import shelve
+from random import randint
 
 from account import Account
 from exceptions import BankError, AccountError
@@ -18,7 +19,6 @@ class Bank:
         """
         self._name = bank_name
         self._database = f"{bank_id}_bank_accounts"
-        self._next_iban = 1
 
     def __str__(self) -> str:
         """Returns a string of the name of the Bank."""
@@ -63,11 +63,12 @@ class Bank:
             account = accounts[str(iban)]
         return account
 
-    def login(self, iban: int) -> Account:
+    def login(self, iban: int, pin: int) -> Account:
         """Authenticate a user logging into an ATM.
 
         Args:
             iban (int): The bank account identifier of the user.
+            pin (int): The user's PIN.
 
         Raises:
             BankError: If the authentication fails.
@@ -76,8 +77,11 @@ class Bank:
             Account: The user's account.
         """
         if iban not in self:
-            raise BankError("User authentication failed")
-        return self.get_account(iban)
+            raise BankError("Account does not exist")
+        account = self.get_account(iban)
+        if not account.check_pin(pin):
+            raise BankError("Incorrect PIN")
+        return account
 
     def valid_user(self, user: Account) -> bool:
         """Checks whether the given user data matches the database.
@@ -89,9 +93,10 @@ class Bank:
             bool: True if the account matches the database, False otherwise.
         """
         validated = False
-        account = self.get_account(user.iban)
-        if user == account:
-            validated = True
+        if isinstance(user, Account):
+            account = self.get_account(user.iban)
+            if user == account:
+                validated = True
         return validated
 
     def check_balance(self, user: Account) -> float:
@@ -138,6 +143,17 @@ class Bank:
                 raise AccountError() from error
             accounts[str(user.iban)] = account
 
+    def reset_pin(self, user: Account, new_pin: int):
+        if not self.valid_user(user):
+            raise BankError("User data has been tampered with")
+        with shelve.open(self._database) as accounts:
+            account = accounts[str(user.iban)]
+            try:
+                account.update_pin(new_pin)
+            except ValueError as error:
+                raise ValueError() from error
+            accounts[str(user.iban)] = account
+
     def deposit(self, user: Account, amount: float):
         """Deposit the given amount into the user's account.
 
@@ -160,6 +176,12 @@ class Bank:
             account = accounts[str(user.iban)]
             account.deposit(amount)
             accounts[str(user.iban)] = account
+    
+    def transfer(self, iban: int, amount: float):
+        if iban not in self:
+            raise BankError("Account does not exist")
+        account = self.get_account(iban)
+        self.deposit(account, amount)
 
     def create_account(self, name: str, pin: int) -> int:
         """Add a user to the bank and return their bank account number (IBAN).
@@ -171,11 +193,10 @@ class Bank:
         Returns:
             int: The users bank account number (IBAN).
         """
-        iban = self._next_iban
+        iban = self._generate_iban()
         account = Account(iban, name, pin)
         with shelve.open(self._database) as accounts:
             accounts[str(iban)] = account
-        self._next_iban += 1
         return iban
 
     def create_admin_account(self, name: str, pin: int) -> int:
@@ -188,11 +209,10 @@ class Bank:
         Returns:
             int: The admin's bank account number (IBAN).
         """
-        iban = self._next_iban
+        iban = self._generate_iban()
         account = Account(iban, name, pin, True)
         with shelve.open(self._database) as accounts:
             accounts[str(iban)] = account
-        self._next_iban += 1
         return iban
 
     def check_admin(self, user: Account) -> bool:
@@ -211,3 +231,16 @@ class Bank:
             raise BankError("User data has been tampered with")
         account = self.get_account(user.iban)
         return account.admin
+
+    def _generate_iban(self) -> int:
+        """Generate a random 8-digit IBAN.
+
+        Returns:
+            int: The new IBAN.
+        """
+        iban = None
+        while iban is None:
+            iban = randint(10000000, 99999999)
+            if iban in self:
+                iban = None
+        return iban

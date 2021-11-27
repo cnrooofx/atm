@@ -23,16 +23,20 @@ class ATM:
         """Return a string of the bank which the ATM is connected to."""
         return f"ATM for {self._bank.name}"
 
-    def login(self, iban: int) -> Account:
+    def login(self, iban: int, pin: int) -> Account:
         """Checks with the bank if the user is permitted to login.
 
         Args:
             iban (int): The bank account identifier of the user.
+            pin (int): The user's PIN.
+
+        Raises:
+            BankError: If the IBAN or PIN are incorrect.
 
         Returns:
             Account: The account of the user logging in.
         """
-        return self._bank.login(iban)
+        return self._bank.login(iban, pin)
 
     def user_check_balance(self, account: Account) -> float:
         """Get the current account balance of a user.
@@ -93,6 +97,17 @@ class ATM:
             raise ValueError("Amount must be greater than 0")
         self._bank.deposit(account, amount)
         self._balance += amount
+
+    def user_transfer(self, account: Account, amount: float,
+                      transfer_bank: str, transfer_iban: int):
+        self.user_withdraw(account, amount)
+        other_bank = self.get_connected_bank(transfer_bank)
+        other_bank.transfer(transfer_iban, amount)
+
+    def user_reset_pin(self, account: Account, new_pin: int):
+        if not isinstance(account, Account):
+            raise TypeError("Not a valid user")
+        self._bank.reset_pin(account, new_pin)
 
     def admin_withdraw(self, account: Account, amount: float):
         """Remove funds from the ATM, if the user is an admin.
@@ -211,3 +226,11 @@ class ATM:
         """
         if bank_name in self._connected_banks:
             return self._connected_banks[bank_name]
+
+    def get_connected_banks(self) -> dict:
+        """Get the dictionary of Banks connected to this ATM.
+
+        Returns:
+            dict: The connected banks.
+        """
+        return self._connected_banks
